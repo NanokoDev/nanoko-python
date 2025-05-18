@@ -17,5 +17,8 @@ runs:
         python-version: ${{ inputs.python-version }}
         enable-cache: true
 
+    - run: uv tool install pyproject-parser[cli]>=v0.13.0b1
+      shell: bash
+
     - run: uv sync --all-groups
       shell: bash
