@@ -1,5 +1,5 @@
 [project]
-name = "nanoko"
+name = "nanoko-python"
 version = "0.1.0"
 description = "Python library for Nanoko API"
 readme = "README.md"
