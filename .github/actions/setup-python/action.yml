@@ -5,17 +5,17 @@ inputs:
   python-version:
     description: Python version
     required: false
-    default: "3.10"
+    default: "3.11"
 
 runs:
   using: "composite"
   steps:
-    - uses: pdm-project/setup-pdm@v3
-      name: Setup PDM
+    - uses: astral-sh/setup-uv@v6
+      name: Setup uv
       with:
+        version: "latest"
         python-version: ${{ inputs.python-version }}
-        architecture: "x64"
-        cache: true
+        enable-cache: true
 
-    - run: pdm sync -G:all
+    - run: uv sync --all-groups
       shell: bash
