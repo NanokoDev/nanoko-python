@@ -24,7 +24,7 @@ class LLMAPI:
         }
         response = self.client.get(f"{self.base_url}/api/v1/llm/hint", params=params)
         response.raise_for_status()
-        return response.json()
+        return response.json()["hint"]
 
 
 class AsyncLLMAPI:
@@ -54,4 +54,4 @@ class AsyncLLMAPI:
             f"{self.base_url}/api/v1/llm/hint", params=params
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["hint"]

@@ -36,7 +36,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/image/upload", files=files
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["hash"]
 
     def add_image(self, description: str, hash: str) -> int:
         """Add an image to the database.
@@ -54,7 +54,7 @@ class BankAPI:
         }
         response = self.client.post(f"{self.base_url}/api/v1/bank/image/add", json=data)
         response.raise_for_status()
-        return response.json()
+        return response.json()["image_id"]
 
     def set_image_description(self, image_id: int, description: str) -> dict:
         """Set the description of an image.
@@ -110,7 +110,7 @@ class BankAPI:
             params={"image_id": image_id},
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["description"]
 
     def get_image(self, image_id: int) -> bytes:
         """Get an image from the database.
@@ -140,7 +140,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/question/add", json=question.model_dump()
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["question_id"]
 
     def set_sub_question_description(
         self, sub_question_id: int, description: str
@@ -411,7 +411,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/image/upload", files=files
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["hash"]
 
     async def add_image(self, description: str, hash: str) -> int:
         """Add an image to the database.
@@ -431,7 +431,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/image/add", json=data
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["image_id"]
 
     async def set_image_description(self, image_id: int, description: str) -> dict:
         """Set the description of an image.
@@ -487,7 +487,7 @@ class AsyncBankAPI:
             params={"image_id": image_id},
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["description"]
 
     async def get_image(self, image_id: int) -> bytes:
         """Get an image from the database.
@@ -517,7 +517,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/question/add", json=question.model_dump()
         )
         response.raise_for_status()
-        return response.json()
+        return response.json()["question_id"]
 
     async def set_sub_question_description(
         self, sub_question_id: int, description: str
