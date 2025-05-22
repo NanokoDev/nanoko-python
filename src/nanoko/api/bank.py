@@ -12,12 +12,14 @@ class BankAPI:
         self.base_url = base_url
         self.client = client or Client()
 
-    def upload_image(self, file: Union[Path, str, BinaryIO, bytes]) -> str:
+    def upload_image(
+        self, file: Union[Path, str, BinaryIO, bytes], content_type: str = "image/png"
+    ) -> str:
         """Upload an image to the server and return its hash.
 
         Args:
             file (Union[Path, str, BinaryIO, bytes]): The image file to upload.
-
+            content_type (str): The content type of the image. Defaults to "image/png".
         Returns:
             str: The hash of the uploaded image.
         """
@@ -26,9 +28,17 @@ class BankAPI:
         if isinstance(file, Path):
             file = file.read_bytes()
         if isinstance(file, bytes):
-            files = {"file": file}
+            files = {
+                "file": (f"image.{content_type.split('/')[1]}", file, content_type)
+            }
         elif isinstance(file, BinaryIO):
-            files = {"file": file.read()}
+            files = {
+                "file": (
+                    f"image.{content_type.split('/')[1]}",
+                    file.read(),
+                    content_type,
+                )
+            }
         else:
             raise ValueError("Invalid file type")
 
@@ -387,11 +397,14 @@ class AsyncBankAPI:
         self.base_url = base_url
         self.client = client or AsyncClient()
 
-    async def upload_image(self, file: Union[Path, str, BinaryIO, bytes]) -> str:
+    async def upload_image(
+        self, file: Union[Path, str, BinaryIO, bytes], content_type: str = "image/png"
+    ) -> str:
         """Upload an image to the server and return its hash.
 
         Args:
             file (Union[Path, str, BinaryIO, bytes]): The image file to upload.
+            content_type (str): The content type of the image. Defaults to "image/png".
 
         Returns:
             str: The hash of the uploaded image.
@@ -401,9 +414,17 @@ class AsyncBankAPI:
         if isinstance(file, Path):
             file = file.read_bytes()
         if isinstance(file, bytes):
-            files = {"file": file}
+            files = {
+                "file": (f"image.{content_type.split('/')[1]}", file, content_type)
+            }
         elif isinstance(file, BinaryIO):
-            files = {"file": file.read()}
+            files = {
+                "file": (
+                    f"image.{content_type.split('/')[1]}",
+                    file.read(),
+                    content_type,
+                )
+            }
         else:
             raise ValueError("Invalid file type")
 
