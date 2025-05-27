@@ -152,6 +152,23 @@ class BankAPI:
         response.raise_for_status()
         return response.json()["question_id"]
 
+    def set_question_name(self, question_id: int, name: str) -> dict:
+        """Set the name of a question.
+
+        Args:
+            question_id (int): The id of the question.
+            name (str): The new name of the question.
+
+        Returns:
+            dict: The result of the operation.
+        """
+        response = self.client.post(
+            f"{self.base_url}/api/v1/bank/question/set/name",
+            json={"question_id": question_id, "name": name},
+        )
+        response.raise_for_status()
+        return response.json()
+
     def set_sub_question_description(
         self, sub_question_id: int, description: str
     ) -> dict:
@@ -322,6 +339,7 @@ class BankAPI:
     def get_questions(
         self,
         question_id: Optional[int] = None,
+        name: Optional[str] = None,
         source: Optional[str] = None,
         concept: Optional[ConceptType] = None,
         process: Optional[ProcessType] = None,
@@ -330,6 +348,7 @@ class BankAPI:
 
         Args:
             question_id (Optional[int], optional): The question id of the question. Defaults to None.
+            name (Optional[str], optional): The name of the question. Defaults to None.
             source (Optional[str], optional): The source of the question. Defaults to None.
             concept (Optional[ConceptType], optional): The concept of questions. Defaults to None.
             process (Optional[ProcessType], optional): The process of questions. Defaults to None.
@@ -340,6 +359,8 @@ class BankAPI:
         params = {}
         if question_id is not None:
             params["question_id"] = question_id
+        if name is not None:
+            params["name"] = name
         if source is not None:
             params["source"] = source
         if concept is not None:
@@ -540,6 +561,26 @@ class AsyncBankAPI:
         response.raise_for_status()
         return response.json()["question_id"]
 
+    async def set_question_name(self, question_id: int, name: str) -> dict:
+        """Set the name of a question.
+
+        Args:
+            question_id (int): The id of the question.
+            name (str): The new name of the question.
+
+        Returns:
+            dict: The result of the operation.
+        """
+        data = {
+            "question_id": question_id,
+            "name": name,
+        }
+        response = await self.client.post(
+            f"{self.base_url}/api/v1/bank/question/set/name", json=data
+        )
+        response.raise_for_status()
+        return response.json()
+
     async def set_sub_question_description(
         self, sub_question_id: int, description: str
     ) -> dict:
@@ -710,6 +751,7 @@ class AsyncBankAPI:
     async def get_questions(
         self,
         question_id: Optional[int] = None,
+        name: Optional[str] = None,
         source: Optional[str] = None,
         concept: Optional[ConceptType] = None,
         process: Optional[ProcessType] = None,
@@ -718,6 +760,7 @@ class AsyncBankAPI:
 
         Args:
             question_id (Optional[int], optional): The question id of the question. Defaults to None.
+            name (Optional[str], optional): The name of the question. Defaults to None.
             source (Optional[str], optional): The source of the question. Defaults to None.
             concept (Optional[ConceptType], optional): The concept of questions. Defaults to None.
             process (Optional[ProcessType], optional): The process of questions. Defaults to None.
@@ -728,6 +771,8 @@ class AsyncBankAPI:
         params = {}
         if question_id is not None:
             params["question_id"] = question_id
+        if name is not None:
+            params["name"] = name
         if source is not None:
             params["source"] = source
         if concept is not None:

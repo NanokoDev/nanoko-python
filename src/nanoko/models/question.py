@@ -40,6 +40,7 @@ class Question(BaseModel):
     """API model for question."""
 
     id: Optional[int] = None
+    name: str
     source: str
     is_audited: Optional[bool] = None
     is_deleted: Optional[bool] = None
