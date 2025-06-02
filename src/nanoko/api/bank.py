@@ -2,6 +2,7 @@ from pathlib import Path
 from httpx import Client, AsyncClient
 from typing import List, Optional, BinaryIO, Union
 
+from nanoko.exceptions import raise_nanoko_api_exception
 from nanoko.models.question import Question, ConceptType, ProcessType
 
 
@@ -45,7 +46,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/image/upload", files=files
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["hash"]
 
     def add_image(self, description: str, hash: str) -> int:
@@ -63,7 +64,7 @@ class BankAPI:
             "hash": hash,
         }
         response = self.client.post(f"{self.base_url}/api/v1/bank/image/add", json=data)
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["image_id"]
 
     def set_image_description(self, image_id: int, description: str) -> dict:
@@ -83,7 +84,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/image/set/description", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_image_hash(self, image_id: int, hash: str) -> dict:
@@ -103,7 +104,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/image/set/hash", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def get_image_description(self, image_id: int) -> str:
@@ -119,7 +120,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/image/get/description",
             params={"image_id": image_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["description"]
 
     def get_image(self, image_id: int) -> bytes:
@@ -134,7 +135,7 @@ class BankAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/bank/image/get", params={"image_id": image_id}
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.content
 
     def add_question(self, question: Question) -> int:
@@ -149,7 +150,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/question/add", json=question.model_dump()
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["question_id"]
 
     def set_question_name(self, question_id: int, name: str) -> dict:
@@ -166,7 +167,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/question/set/name",
             json={"question_id": question_id, "name": name},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_description(
@@ -189,7 +190,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/sub-question/set/description",
             json=data,
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_options(
@@ -211,7 +212,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/options", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_answer(self, sub_question_id: int, answer: str) -> dict:
@@ -231,7 +232,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/answer", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_concept(
@@ -253,7 +254,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/concept", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_process(
@@ -275,7 +276,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/process", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_keywords(
@@ -297,7 +298,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/keywords", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def set_sub_question_image(self, sub_question_id: int, image_id: int) -> dict:
@@ -317,7 +318,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/image", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def delete_sub_question_image(self, sub_question_id: int) -> dict:
@@ -333,7 +334,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/sub-question/delete/image",
             params={"sub_question_id": sub_question_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def get_questions(
@@ -371,7 +372,7 @@ class BankAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/bank/question/get", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return [Question.model_validate(q) for q in response.json()]
 
     def approve_question(self, question_id: int) -> dict:
@@ -389,7 +390,7 @@ class BankAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/bank/question/approve", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def delete_question(self, question_id: int) -> dict:
@@ -405,7 +406,7 @@ class BankAPI:
             f"{self.base_url}/api/v1/bank/question/delete",
             params={"question_id": question_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
 
@@ -452,7 +453,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/image/upload", files=files
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["hash"]
 
     async def add_image(self, description: str, hash: str) -> int:
@@ -472,7 +473,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/image/add", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["image_id"]
 
     async def set_image_description(self, image_id: int, description: str) -> dict:
@@ -492,7 +493,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/image/set/description", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_image_hash(self, image_id: int, hash: str) -> dict:
@@ -512,7 +513,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/image/set/hash", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def get_image_description(self, image_id: int) -> str:
@@ -528,7 +529,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/image/get/description",
             params={"image_id": image_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["description"]
 
     async def get_image(self, image_id: int) -> bytes:
@@ -543,7 +544,7 @@ class AsyncBankAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/bank/image/get", params={"image_id": image_id}
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.content
 
     async def add_question(self, question: Question) -> int:
@@ -558,7 +559,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/question/add", json=question.model_dump()
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["question_id"]
 
     async def set_question_name(self, question_id: int, name: str) -> dict:
@@ -578,7 +579,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/question/set/name", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_description(
@@ -601,7 +602,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/sub-question/set/description",
             json=data,
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_options(
@@ -623,7 +624,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/options", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_answer(self, sub_question_id: int, answer: str) -> dict:
@@ -643,7 +644,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/answer", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_concept(
@@ -665,7 +666,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/concept", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_process(
@@ -687,7 +688,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/process", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_keywords(
@@ -709,7 +710,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/keywords", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def set_sub_question_image(self, sub_question_id: int, image_id: int) -> dict:
@@ -729,7 +730,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/sub-question/set/image", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def delete_sub_question_image(self, sub_question_id: int) -> dict:
@@ -745,7 +746,7 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/sub-question/delete/image",
             params={"sub_question_id": sub_question_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def get_questions(
@@ -783,7 +784,7 @@ class AsyncBankAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/bank/question/get", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return [Question.model_validate(q) for q in response.json()]
 
     async def approve_question(self, question_id: int) -> dict:
@@ -801,7 +802,7 @@ class AsyncBankAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/bank/question/approve", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def delete_question(self, question_id: int) -> dict:
@@ -817,5 +818,5 @@ class AsyncBankAPI:
             f"{self.base_url}/api/v1/bank/question/delete",
             params={"question_id": question_id},
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()

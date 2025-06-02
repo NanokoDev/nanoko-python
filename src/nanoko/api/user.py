@@ -2,11 +2,8 @@ from typing import List
 from httpx import Client, AsyncClient
 
 from nanoko.models.user import Permission, User
-from nanoko.models.assignment import (
-    Class,
-    FeedBack,
-    Assignment,
-)
+from nanoko.exceptions import raise_nanoko_api_exception
+from nanoko.models.assignment import Class, FeedBack, Assignment
 
 
 class UserAPI:
@@ -45,7 +42,7 @@ class UserAPI:
             "permission": permission.value,
         }
         response = self.client.post(f"{self.base_url}/api/v1/user/register", json=data)
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return User.model_validate(response.json())
 
     def login(self, username: str, password: str) -> None:
@@ -69,7 +66,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/token", headers=headers, data=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
 
         self._token = response.json()["access_token"]
         self.client.headers["Authorization"] = f"Bearer {self._token}"
@@ -83,7 +80,7 @@ class UserAPI:
             User: The current user's information.
         """
         response = self.client.get(f"{self.base_url}/api/v1/user/me")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return User.model_validate(response.json())
 
     def submit(self, sub_question_id: int, assignment_id: int, answer: str) -> FeedBack:
@@ -103,7 +100,7 @@ class UserAPI:
             "answer": answer,
         }
         response = self.client.post(f"{self.base_url}/api/v1/user/submit", json=data)
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
 
     def reset_password(self, old_password: str, new_password: str) -> dict:
@@ -120,7 +117,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/password/reset", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def create_class(self, class_name: str, enter_code: str) -> Class:
@@ -137,7 +134,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/class/create", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
     def join_class(self, class_name: str, enter_code: str) -> Class:
@@ -154,7 +151,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/class/join", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
     def leave_class(self) -> dict:
@@ -164,7 +161,7 @@ class UserAPI:
             dict: The result of the operation.
         """
         response = self.client.post(f"{self.base_url}/api/v1/user/class/leave")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def create_assignment(
@@ -194,7 +191,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/assignment/create", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Assignment.model_validate(response.json())
 
     def assign_assignment(self, assignment_id: int, class_id: int) -> dict:
@@ -211,7 +208,7 @@ class UserAPI:
         response = self.client.post(
             f"{self.base_url}/api/v1/user/assignment/assign", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     def get_assignments(self) -> List[Assignment]:
@@ -221,7 +218,7 @@ class UserAPI:
             List[Assignment]: The list of assignments.
         """
         response = self.client.get(f"{self.base_url}/api/v1/user/assignments")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]
 
 
@@ -265,7 +262,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/register", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return User.model_validate(response.json())
 
     async def login(self, username: str, password: str) -> None:
@@ -289,7 +286,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/token", headers=headers, data=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
 
         self._token = response.json()["access_token"]
         self.client.headers["Authorization"] = f"Bearer {self._token}"
@@ -303,7 +300,7 @@ class AsyncUserAPI:
             User: The current user's information.
         """
         response = await self.client.get(f"{self.base_url}/api/v1/user/me")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return User.model_validate(response.json())
 
     async def submit(
@@ -327,7 +324,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/submit", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
 
     async def reset_password(self, old_password: str, new_password: str) -> dict:
@@ -344,7 +341,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/password/reset", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def create_class(self, class_name: str, enter_code: str) -> Class:
@@ -361,7 +358,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/class/create", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
     async def join_class(self, class_name: str, enter_code: str) -> Class:
@@ -378,7 +375,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/class/join", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
     async def leave_class(self) -> dict:
@@ -388,7 +385,7 @@ class AsyncUserAPI:
             dict: The result of the operation.
         """
         response = await self.client.post(f"{self.base_url}/api/v1/user/class/leave")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def create_assignment(
@@ -418,7 +415,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/assignment/create", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Assignment.model_validate(response.json())
 
     async def assign_assignment(self, assignment_id: int, class_id: int) -> dict:
@@ -435,7 +432,7 @@ class AsyncUserAPI:
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/assignment/assign", json=data
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()
 
     async def get_assignments(self) -> List[Assignment]:
@@ -445,5 +442,5 @@ class AsyncUserAPI:
             List[Assignment]: The list of assignments.
         """
         response = await self.client.get(f"{self.base_url}/api/v1/user/assignments")
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]

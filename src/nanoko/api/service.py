@@ -2,6 +2,7 @@ from typing import Optional
 from datetime import datetime
 from httpx import Client, AsyncClient
 
+from nanoko.exceptions import raise_nanoko_api_exception
 from nanoko.models.performance import (
     Performances,
     PerformancesData,
@@ -29,7 +30,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return PerformancesData.model_validate(response.json())
 
     def get_best_performances(self, user_id: int) -> Performances:
@@ -45,7 +46,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances/best", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     def get_average_performances(self, user_id: int) -> Performances:
@@ -61,7 +62,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances/average", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     def get_recent_best_performances(
@@ -80,7 +81,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances/best/recent", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     def get_recent_average_performances(
@@ -99,7 +100,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances/average/recent", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     def get_performance_trends(
@@ -120,7 +121,7 @@ class ServiceAPI:
         response = self.client.get(
             f"{self.base_url}/api/v1/service/performances/trends", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())
 
 
@@ -146,7 +147,7 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return PerformancesData.model_validate(response.json())
 
     async def get_best_performances(self, user_id: int) -> Performances:
@@ -162,7 +163,7 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances/best", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     async def get_average_performances(self, user_id: int) -> Performances:
@@ -178,7 +179,7 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances/average", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     async def get_recent_best_performances(
@@ -197,7 +198,7 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances/best/recent", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     async def get_recent_average_performances(
@@ -216,7 +217,7 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances/average/recent", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return Performances.model_validate(response.json())
 
     async def get_performance_trends(
@@ -237,5 +238,5 @@ class AsyncServiceAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/service/performances/trends", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())

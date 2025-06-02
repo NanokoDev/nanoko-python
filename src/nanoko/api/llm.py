@@ -1,5 +1,7 @@
 from httpx import Client, AsyncClient
 
+from nanoko.exceptions import raise_nanoko_api_exception
+
 
 class LLMAPI:
     """The API for the LLM."""
@@ -23,7 +25,7 @@ class LLMAPI:
             "question": question,
         }
         response = self.client.get(f"{self.base_url}/api/v1/llm/hint", params=params)
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["hint"]
 
 
@@ -53,5 +55,5 @@ class AsyncLLMAPI:
         response = await self.client.get(
             f"{self.base_url}/api/v1/llm/hint", params=params
         )
-        response.raise_for_status()
+        raise_nanoko_api_exception(response)
         return response.json()["hint"]
