@@ -6,11 +6,11 @@ from pydantic import BaseModel, Field
 class Performance(Enum):
     """A standard to represent the performance of students."""
 
-    NOT_ACHIEVED = 0
-    PARTIALLY_ACHIEVED = 1
-    SATISFACTORILY_ACHIEVED = 2
-    EXPERTLY_ACHIEVED = 3
-    ADVANCED = 4
+    NOT_STARTED = 0
+    ATTEMPTED = 1
+    FAMILIAR = 2
+    PROFICIENT = 3
+    MASTERED = 4
 
 
 class Trend(Enum):
