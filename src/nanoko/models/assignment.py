@@ -1,3 +1,5 @@
+from typing import Optional
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -8,6 +10,7 @@ class Assignment(BaseModel):
     name: str
     description: str
     teacher_id: int
+    due_date: Optional[datetime] = None
 
 
 class Class(BaseModel):
