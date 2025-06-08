@@ -2,6 +2,8 @@ from enum import Enum
 from typing import List
 from pydantic import BaseModel, Field
 
+from nanoko.models.assignment import Assignment
+
 
 class Performance(Enum):
     """A standard to represent the performance of students."""
@@ -81,3 +83,13 @@ class PerformanceTrends(BaseModel):
     measurement: ProcessTrends
     statistics_and_data: ProcessTrends
     elements_of_chance: ProcessTrends
+
+
+class Overview(BaseModel):
+    """Overview model for dashboard."""
+
+    class_name: str
+    assignments: List[Assignment]
+    display_name: str
+    total_question_number: int
+    performances: Performances

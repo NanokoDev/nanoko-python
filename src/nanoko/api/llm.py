@@ -1,5 +1,7 @@
+from typing import Optional, List
 from httpx import Client, AsyncClient
 
+from nanoko.models.llm import LLMMessage
 from nanoko.exceptions import raise_nanoko_api_exception
 
 
@@ -10,12 +12,18 @@ class LLMAPI:
         self.base_url = base_url
         self.client = client or Client()
 
-    def get_hint(self, sub_question_id: int, question: str) -> str:
+    def get_hint(
+        self,
+        sub_question_id: int,
+        question: str,
+        context: Optional[List[LLMMessage]] = None,
+    ) -> str:
         """Get a hint for the sub-question.
 
         Args:
             sub_question_id (int): The ID of the sub-question.
             question (str): The question to ask.
+            context (Optional[List[LLMMessage]]): The context to send to the LLM.
 
         Returns:
             str: The hint for the sub-question.
@@ -23,8 +31,11 @@ class LLMAPI:
         params = {
             "sub_question_id": sub_question_id,
             "question": question,
+            "context": [],
         }
-        response = self.client.get(f"{self.base_url}/api/v1/llm/hint", params=params)
+        if context:
+            params["context"] = [message.model_dump() for message in context]
+        response = self.client.post(f"{self.base_url}/api/v1/llm/hint", json=params)
         raise_nanoko_api_exception(response)
         return response.json()["hint"]
 
@@ -38,12 +49,18 @@ class AsyncLLMAPI:
         self.base_url = base_url
         self.client = client or AsyncClient()
 
-    async def get_hint(self, sub_question_id: int, question: str) -> str:
+    async def get_hint(
+        self,
+        sub_question_id: int,
+        question: str,
+        context: Optional[List[LLMMessage]] = None,
+    ) -> str:
         """Get a hint for the sub-question.
 
         Args:
             sub_question_id (int): The ID of the sub-question.
             question (str): The question to ask.
+            context (Optional[List[LLMMessage]]): The context to send to the LLM.
 
         Returns:
             str: The hint for the sub-question.
@@ -52,8 +69,10 @@ class AsyncLLMAPI:
             "sub_question_id": sub_question_id,
             "question": question,
         }
-        response = await self.client.get(
-            f"{self.base_url}/api/v1/llm/hint", params=params
+        if context:
+            params["context"] = [message.model_dump() for message in context]
+        response = await self.client.post(
+            f"{self.base_url}/api/v1/llm/hint", json=params
         )
         raise_nanoko_api_exception(response)
         return response.json()["hint"]

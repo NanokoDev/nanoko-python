@@ -2,6 +2,8 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import List, Optional
 
+from nanoko.models.performance import Performance
+
 
 class ConceptType(Enum):
     """Concept enum for the concept of subquestions."""
@@ -34,6 +36,11 @@ class SubQuestion(BaseModel):
     keywords: Optional[List[str]] = None
     options: Optional[List[str]] = None
     image_id: Optional[int] = None
+
+    # For completed sub-questions
+    submitted_answer: Optional[str] = None
+    performance: Optional[Performance] = None
+    feedback: Optional[str] = None
 
 
 class Question(BaseModel):

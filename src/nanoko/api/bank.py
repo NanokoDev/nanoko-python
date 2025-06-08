@@ -339,7 +339,7 @@ class BankAPI:
 
     def get_questions(
         self,
-        question_id: Optional[int] = None,
+        question_ids: Optional[List[int]] = None,
         name: Optional[str] = None,
         source: Optional[str] = None,
         concept: Optional[ConceptType] = None,
@@ -348,7 +348,7 @@ class BankAPI:
         """Get questions from the database.
 
         Args:
-            question_id (Optional[int], optional): The question id of the question. Defaults to None.
+            question_ids (Optional[List[int]], optional): The question ids of the questions. Defaults to None.
             name (Optional[str], optional): The name of the question. Defaults to None.
             source (Optional[str], optional): The source of the question. Defaults to None.
             concept (Optional[ConceptType], optional): The concept of questions. Defaults to None.
@@ -358,8 +358,8 @@ class BankAPI:
             List[Question]: The list of questions.
         """
         params = {}
-        if question_id is not None:
-            params["question_id"] = question_id
+        if question_ids is not None:
+            params["question_ids"] = question_ids
         if name is not None:
             params["name"] = name
         if source is not None:
@@ -751,7 +751,7 @@ class AsyncBankAPI:
 
     async def get_questions(
         self,
-        question_id: Optional[int] = None,
+        question_ids: Optional[List[int]] = None,
         name: Optional[str] = None,
         source: Optional[str] = None,
         concept: Optional[ConceptType] = None,
@@ -760,7 +760,7 @@ class AsyncBankAPI:
         """Get questions from the database.
 
         Args:
-            question_id (Optional[int], optional): The question id of the question. Defaults to None.
+            question_ids (Optional[List[int]], optional): The question ids of the questions. Defaults to None.
             name (Optional[str], optional): The name of the question. Defaults to None.
             source (Optional[str], optional): The source of the question. Defaults to None.
             concept (Optional[ConceptType], optional): The concept of questions. Defaults to None.
@@ -770,8 +770,8 @@ class AsyncBankAPI:
             List[Question]: The list of questions.
         """
         params = {}
-        if question_id is not None:
-            params["question_id"] = question_id
+        if question_ids is not None:
+            params["question_ids"] = question_ids
         if name is not None:
             params["name"] = name
         if source is not None:

@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 from httpx import Client, AsyncClient
 
 from nanoko.models.user import Permission, User
+from nanoko.models.question import Question, SubQuestion
 from nanoko.exceptions import raise_nanoko_api_exception
-from nanoko.models.assignment import Class, FeedBack, Assignment
+from nanoko.models.assignment import Class, FeedBack, Assignment, ClassData
 
 
 class UserAPI:
@@ -102,6 +103,52 @@ class UserAPI:
         response = self.client.post(f"{self.base_url}/api/v1/user/submit", json=data)
         raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
+
+    def get_completed_sub_questions(
+        self, assignment_id: Optional[int] = None
+    ) -> List[SubQuestion]:
+        """Get the completed sub-questions for the current user.
+
+        Args:
+            assignment_id (Optional[int], optional): The assignment id. Defaults to None.
+
+        Returns:
+            List[SubQuestion]: The list of completed sub-questions.
+        """
+        data = {}
+        if assignment_id is not None:
+            data["assignment_id"] = assignment_id
+        response = self.client.get(
+            f"{self.base_url}/api/v1/user/sub-questions/completed", params=data
+        )
+        raise_nanoko_api_exception(response)
+        return [SubQuestion.model_validate(s) for s in response.json()]
+
+    def get_completed_questions(self) -> List[Question]:
+        """Get the completed questions for the current user.
+
+        Returns:
+            List[Question]: The list of completed questions.
+        """
+        response = self.client.get(f"{self.base_url}/api/v1/user/questions/completed")
+        raise_nanoko_api_exception(response)
+        return [Question.model_validate(q) for q in response.json()]
+
+    def get_completed_question(self, question_id: int) -> Question:
+        """Get the completed question for the current user.
+
+        Args:
+            question_id (int): The id of the question.
+
+        Returns:
+            Question: The completed question.
+        """
+        params = {"question_id": question_id}
+        response = self.client.get(
+            f"{self.base_url}/api/v1/user/question/completed", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return Question.model_validate(response.json())
 
     def reset_password(self, old_password: str, new_password: str) -> dict:
         """Reset the password for the current user.
@@ -221,6 +268,16 @@ class UserAPI:
         raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]
 
+    def get_class_data(self) -> ClassData:
+        """Get the class data for the current user.
+
+        Returns:
+            ClassData: The class data object.
+        """
+        response = self.client.get(f"{self.base_url}/api/v1/user/class/data")
+        raise_nanoko_api_exception(response)
+        return ClassData.model_validate(response.json())
+
 
 class AsyncUserAPI:
     """The async API for the user."""
@@ -326,6 +383,54 @@ class AsyncUserAPI:
         )
         raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
+
+    async def get_completed_sub_questions(
+        self, assignment_id: Optional[int] = None
+    ) -> List[SubQuestion]:
+        """Get the completed sub-questions for the current user.
+
+        Args:
+            assignment_id (Optional[int], optional): The assignment id. Defaults to None.
+
+        Returns:
+            List[SubQuestion]: The list of completed sub-questions.
+        """
+        data = {}
+        if assignment_id is not None:
+            data["assignment_id"] = assignment_id
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/sub-questions/completed", params=data
+        )
+        raise_nanoko_api_exception(response)
+        return [SubQuestion.model_validate(s) for s in response.json()]
+
+    async def get_completed_questions(self) -> List[Question]:
+        """Get the completed questions for the current user.
+
+        Returns:
+            List[Question]: The list of completed questions.
+        """
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/question/completed"
+        )
+        raise_nanoko_api_exception(response)
+        return [Question.model_validate(q) for q in response.json()]
+
+    async def get_completed_question(self, question_id: int) -> Question:
+        """Get the completed question for the current user.
+
+        Args:
+            question_id (int): The id of the question.
+
+        Returns:
+            Question: The completed question.
+        """
+        params = {"question_id": question_id}
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/questions/completed", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return Question.model_validate(response.json())
 
     async def reset_password(self, old_password: str, new_password: str) -> dict:
         """Reset the password for the current user.
@@ -444,3 +549,13 @@ class AsyncUserAPI:
         response = await self.client.get(f"{self.base_url}/api/v1/user/assignments")
         raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]
+
+    async def get_class_data(self) -> ClassData:
+        """Get the class data for the current user.
+
+        Returns:
+            ClassData: The class data object.
+        """
+        response = await self.client.get(f"{self.base_url}/api/v1/user/class/data")
+        raise_nanoko_api_exception(response)
+        return ClassData.model_validate(response.json())

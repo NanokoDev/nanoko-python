@@ -4,6 +4,7 @@ from httpx import Client, AsyncClient
 
 from nanoko.exceptions import raise_nanoko_api_exception
 from nanoko.models.performance import (
+    Overview,
     Performances,
     PerformancesData,
     PerformanceTrends,
@@ -124,6 +125,16 @@ class ServiceAPI:
         raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())
 
+    def get_overview(self) -> Overview:
+        """Get the overview of a user.
+
+        Returns:
+            Overview: The overview data of the user.
+        """
+        response = self.client.get(f"{self.base_url}/api/v1/service/overview")
+        raise_nanoko_api_exception(response)
+        return Overview.model_validate(response.json())
+
 
 class AsyncServiceAPI:
     """The async API for the service."""
@@ -240,3 +251,13 @@ class AsyncServiceAPI:
         )
         raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())
+
+    async def get_overview(self) -> Overview:
+        """Get the overview of a user.
+
+        Returns:
+            Overview: The overview data of the user.
+        """
+        response = await self.client.get(f"{self.base_url}/api/v1/service/overview")
+        raise_nanoko_api_exception(response)
+        return Overview.model_validate(response.json())
