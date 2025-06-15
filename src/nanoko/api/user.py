@@ -1,10 +1,19 @@
-from typing import List, Optional
+import datetime
+from pydantic import ValidationError
 from httpx import Client, AsyncClient
+from typing import List, Optional, Union
 
 from nanoko.models.user import Permission, User
 from nanoko.models.question import Question, SubQuestion
 from nanoko.exceptions import raise_nanoko_api_exception
-from nanoko.models.assignment import Class, FeedBack, Assignment, ClassData
+from nanoko.models.assignment import (
+    Class,
+    FeedBack,
+    ClassData,
+    Assignment,
+    TeacherClassData,
+    AssignmentReviewData,
+)
 
 
 class UserAPI:
@@ -104,6 +113,16 @@ class UserAPI:
         raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
 
+    def get_questions(self) -> List[Question]:
+        """Get the questions created by the current user.
+
+        Returns:
+            List[Question]: The list of questions.
+        """
+        response = self.client.get(f"{self.base_url}/api/v1/user/questions")
+        raise_nanoko_api_exception(response)
+        return [Question.model_validate(q) for q in response.json()]
+
     def get_completed_sub_questions(
         self, assignment_id: Optional[int] = None
     ) -> List[SubQuestion]:
@@ -149,6 +168,26 @@ class UserAPI:
         )
         raise_nanoko_api_exception(response)
         return Question.model_validate(response.json())
+
+    def get_assignment_image(self, assignment_id: int) -> Optional[bytes]:
+        """Get the image of an assignment.
+
+        Args:
+            assignment_id (int): The id of the assignment.
+
+        Returns:
+            Optional[bytes]: The image file.
+        """
+        response = self.client.get(
+            f"{self.base_url}/api/v1/user/assignment/image/get",
+            params={"assignment_id": assignment_id},
+        )
+        raise_nanoko_api_exception(response)
+
+        if response.status_code == 204:
+            return None
+
+        return response.content
 
     def reset_password(self, old_password: str, new_password: str) -> dict:
         """Reset the password for the current user.
@@ -201,13 +240,18 @@ class UserAPI:
         raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
-    def leave_class(self) -> dict:
-        """Leave the current class.
+    def kick_student(self, student_id: int) -> dict:
+        """Kick a student from the current class.
+
+        Args:
+            student_id (int): The id of the student to kick.
 
         Returns:
             dict: The result of the operation.
         """
-        response = self.client.post(f"{self.base_url}/api/v1/user/class/leave")
+        response = self.client.post(
+            f"{self.base_url}/api/v1/user/class/kick", json={"student_id": student_id}
+        )
         raise_nanoko_api_exception(response)
         return response.json()
 
@@ -215,7 +259,6 @@ class UserAPI:
         self,
         assignment_name: str,
         description: str,
-        due_date: str,
         question_ids: List[int],
     ) -> Assignment:
         """Create a new assignment.
@@ -223,7 +266,6 @@ class UserAPI:
         Args:
             assignment_name (str): The name of the assignment.
             description (str): The description of the assignment.
-            due_date (str): The due date of the assignment in ISO format.
             question_ids (List[int]): The list of question ids to include in the assignment.
 
         Returns:
@@ -232,7 +274,6 @@ class UserAPI:
         data = {
             "assignment_name": assignment_name,
             "description": description,
-            "due_date": due_date,
             "question_ids": question_ids,
         }
         response = self.client.post(
@@ -241,17 +282,24 @@ class UserAPI:
         raise_nanoko_api_exception(response)
         return Assignment.model_validate(response.json())
 
-    def assign_assignment(self, assignment_id: int, class_id: int) -> dict:
+    def assign_assignment(
+        self, assignment_id: int, class_id: int, due_date: datetime.datetime
+    ) -> dict:
         """Assign an assignment to a class.
 
         Args:
             assignment_id (int): The id of the assignment.
             class_id (int): The id of the class.
+            due_date (datetime.datetime): The due date of the assignment.
 
         Returns:
             dict: The result of the operation.
         """
-        data = {"assignment_id": assignment_id, "class_id": class_id}
+        data = {
+            "assignment_id": assignment_id,
+            "class_id": class_id,
+            "due_date": due_date.isoformat(),
+        }
         response = self.client.post(
             f"{self.base_url}/api/v1/user/assignment/assign", json=data
         )
@@ -268,15 +316,49 @@ class UserAPI:
         raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]
 
-    def get_class_data(self) -> ClassData:
+    def get_assignment_review_data(
+        self, assignment_id: int, class_id: int
+    ) -> AssignmentReviewData:
+        """Get the assignment review data for the current user.
+
+        Args:
+            assignment_id (int): The id of the assignment.
+            class_id (int): The id of the class.
+
+        Returns:
+            AssignmentReviewData: The assignment review data.
+        """
+        params = {"assignment_id": assignment_id, "class_id": class_id}
+        response = self.client.get(
+            f"{self.base_url}/api/v1/user/assignment/review", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return AssignmentReviewData.model_validate(response.json())
+
+    def get_class_data(
+        self, class_id: Optional[int] = None
+    ) -> Union[ClassData, TeacherClassData]:
         """Get the class data for the current user.
+        If the user is a teacher, the class data will be returned as a TeacherClassData object.
+        If the user is a student, the class data will be returned as a ClassData object.
+
+        Args:
+            class_id (Optional[int], optional): The id of the class. Defaults to None.
 
         Returns:
             ClassData: The class data object.
         """
-        response = self.client.get(f"{self.base_url}/api/v1/user/class/data")
+        params = {}
+        if class_id is not None:
+            params["class_id"] = class_id
+        response = self.client.get(
+            f"{self.base_url}/api/v1/user/class/data", params=params
+        )
         raise_nanoko_api_exception(response)
-        return ClassData.model_validate(response.json())
+        try:
+            return ClassData.model_validate(response.json())
+        except ValidationError:
+            return TeacherClassData.model_validate(response.json())
 
 
 class AsyncUserAPI:
@@ -384,6 +466,16 @@ class AsyncUserAPI:
         raise_nanoko_api_exception(response)
         return FeedBack.model_validate(response.json())
 
+    async def get_questions(self) -> List[Question]:
+        """Get the questions created by the current user.
+
+        Returns:
+            List[Question]: The list of questions.
+        """
+        response = await self.client.get(f"{self.base_url}/api/v1/user/questions")
+        raise_nanoko_api_exception(response)
+        return [Question.model_validate(q) for q in response.json()]
+
     async def get_completed_sub_questions(
         self, assignment_id: Optional[int] = None
     ) -> List[SubQuestion]:
@@ -431,6 +523,26 @@ class AsyncUserAPI:
         )
         raise_nanoko_api_exception(response)
         return Question.model_validate(response.json())
+
+    async def get_assignment_image(self, assignment_id: int) -> Optional[bytes]:
+        """Get the image of an assignment.
+
+        Args:
+            assignment_id (int): The id of the assignment.
+
+        Returns:
+            Optional[bytes]: The image file.
+        """
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/assignment/image/get",
+            params={"assignment_id": assignment_id},
+        )
+        raise_nanoko_api_exception(response)
+
+        if response.status_code == 204:
+            return None
+
+        return response.content
 
     async def reset_password(self, old_password: str, new_password: str) -> dict:
         """Reset the password for the current user.
@@ -483,13 +595,18 @@ class AsyncUserAPI:
         raise_nanoko_api_exception(response)
         return Class.model_validate(response.json())
 
-    async def leave_class(self) -> dict:
-        """Leave the current class.
+    async def kick_student(self, student_id: int) -> dict:
+        """Kick a student from the current class.
+
+        Args:
+            student_id (int): The id of the student to kick.
 
         Returns:
             dict: The result of the operation.
         """
-        response = await self.client.post(f"{self.base_url}/api/v1/user/class/leave")
+        response = await self.client.post(
+            f"{self.base_url}/api/v1/user/class/kick", json={"student_id": student_id}
+        )
         raise_nanoko_api_exception(response)
         return response.json()
 
@@ -497,7 +614,6 @@ class AsyncUserAPI:
         self,
         assignment_name: str,
         description: str,
-        due_date: str,
         question_ids: List[int],
     ) -> Assignment:
         """Create a new assignment.
@@ -505,7 +621,6 @@ class AsyncUserAPI:
         Args:
             assignment_name (str): The name of the assignment.
             description (str): The description of the assignment.
-            due_date (str): The due date of the assignment in ISO format.
             question_ids (List[int]): The list of question ids to include in the assignment.
 
         Returns:
@@ -514,7 +629,6 @@ class AsyncUserAPI:
         data = {
             "assignment_name": assignment_name,
             "description": description,
-            "due_date": due_date,
             "question_ids": question_ids,
         }
         response = await self.client.post(
@@ -523,17 +637,24 @@ class AsyncUserAPI:
         raise_nanoko_api_exception(response)
         return Assignment.model_validate(response.json())
 
-    async def assign_assignment(self, assignment_id: int, class_id: int) -> dict:
+    async def assign_assignment(
+        self, assignment_id: int, class_id: int, due_date: datetime.datetime
+    ) -> dict:
         """Assign an assignment to a class.
 
         Args:
             assignment_id (int): The id of the assignment.
             class_id (int): The id of the class.
+            due_date (datetime.datetime): The due date of the assignment.
 
         Returns:
             dict: The result of the operation.
         """
-        data = {"assignment_id": assignment_id, "class_id": class_id}
+        data = {
+            "assignment_id": assignment_id,
+            "class_id": class_id,
+            "due_date": due_date.isoformat(),
+        }
         response = await self.client.post(
             f"{self.base_url}/api/v1/user/assignment/assign", json=data
         )
@@ -550,12 +671,46 @@ class AsyncUserAPI:
         raise_nanoko_api_exception(response)
         return [Assignment.model_validate(a) for a in response.json()]
 
-    async def get_class_data(self) -> ClassData:
+    async def get_assignment_review_data(
+        self, assignment_id: int, class_id: int
+    ) -> AssignmentReviewData:
+        """Get the assignment review data for the current user.
+
+        Args:
+            assignment_id (int): The id of the assignment.
+            class_id (int): The id of the class.
+
+        Returns:
+            AssignmentReviewData: The assignment review data.
+        """
+        params = {"assignment_id": assignment_id, "class_id": class_id}
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/assignment/review", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return AssignmentReviewData.model_validate(response.json())
+
+    async def get_class_data(
+        self, class_id: Optional[int] = None
+    ) -> Union[ClassData, TeacherClassData]:
         """Get the class data for the current user.
+        If the user is a teacher, the class data will be returned as a TeacherClassData object.
+        If the user is a student, the class data will be returned as a ClassData object.
+
+        Args:
+            class_id (Optional[int], optional): The id of the class. Defaults to None.
 
         Returns:
             ClassData: The class data object.
         """
-        response = await self.client.get(f"{self.base_url}/api/v1/user/class/data")
+        params = {}
+        if class_id is not None:
+            params["class_id"] = class_id
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/user/class/data", params=params
+        )
         raise_nanoko_api_exception(response)
-        return ClassData.model_validate(response.json())
+        try:
+            return ClassData.model_validate(response.json())
+        except ValidationError:
+            return TeacherClassData.model_validate(response.json())

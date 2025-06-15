@@ -6,8 +6,10 @@ from nanoko.exceptions import raise_nanoko_api_exception
 from nanoko.models.performance import (
     Overview,
     Performances,
+    TeacherOverview,
     PerformancesData,
     PerformanceTrends,
+    PerformanceDateData,
 )
 
 
@@ -125,6 +127,24 @@ class ServiceAPI:
         raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())
 
+    def get_performance_date_data(
+        self, user_id: int, start_time: Optional[datetime] = None
+    ) -> PerformanceDateData:
+        """Get the performance data of a student over time.
+
+        Args:
+            user_id (int): The id of the user to get the performance data for.
+            start_time (datetime, optional): The start time to get the performance data from. Defaults to None.
+        """
+        params = {"user_id": user_id}
+        if start_time is not None:
+            params["start_time"] = start_time.isoformat()
+        response = self.client.get(
+            f"{self.base_url}/api/v1/service/performances/date", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return PerformanceDateData.model_validate(response.json())
+
     def get_overview(self) -> Overview:
         """Get the overview of a user.
 
@@ -134,6 +154,16 @@ class ServiceAPI:
         response = self.client.get(f"{self.base_url}/api/v1/service/overview")
         raise_nanoko_api_exception(response)
         return Overview.model_validate(response.json())
+
+    def get_teacher_overview(self) -> TeacherOverview:
+        """Get the overview of a teacher.
+
+        Returns:
+            TeacherOverview: The overview data of the teacher.
+        """
+        response = self.client.get(f"{self.base_url}/api/v1/service/overview/teacher")
+        raise_nanoko_api_exception(response)
+        return TeacherOverview.model_validate(response.json())
 
 
 class AsyncServiceAPI:
@@ -252,6 +282,24 @@ class AsyncServiceAPI:
         raise_nanoko_api_exception(response)
         return PerformanceTrends.model_validate(response.json())
 
+    async def get_performance_date_data(
+        self, user_id: int, start_time: Optional[datetime] = None
+    ) -> PerformanceDateData:
+        """Get the performance data of a student over time.
+
+        Args:
+            user_id (int): The id of the user to get the performance data for.
+            start_time (datetime, optional): The start time to get the performance data from. Defaults to None.
+        """
+        params = {"user_id": user_id}
+        if start_time is not None:
+            params["start_time"] = start_time.isoformat()
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/service/performances/date", params=params
+        )
+        raise_nanoko_api_exception(response)
+        return PerformanceDateData.model_validate(response.json())
+
     async def get_overview(self) -> Overview:
         """Get the overview of a user.
 
@@ -261,3 +309,15 @@ class AsyncServiceAPI:
         response = await self.client.get(f"{self.base_url}/api/v1/service/overview")
         raise_nanoko_api_exception(response)
         return Overview.model_validate(response.json())
+
+    async def get_teacher_overview(self) -> TeacherOverview:
+        """Get the overview of a teacher.
+
+        Returns:
+            TeacherOverview: The overview data of the teacher.
+        """
+        response = await self.client.get(
+            f"{self.base_url}/api/v1/service/overview/teacher"
+        )
+        raise_nanoko_api_exception(response)
+        return TeacherOverview.model_validate(response.json())

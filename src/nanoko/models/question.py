@@ -1,8 +1,17 @@
 from enum import Enum
-from pydantic import BaseModel
 from typing import List, Optional
+from pydantic import BaseModel, ConfigDict, model_serializer
 
-from nanoko.models.performance import Performance
+
+# Unsolvable circular import
+class Performance(Enum):
+    """A standard to represent the performance of students."""
+
+    NOT_STARTED = 0
+    ATTEMPTED = 1
+    FAMILIAR = 2
+    PROFICIENT = 3
+    MASTERED = 4
 
 
 class ConceptType(Enum):
@@ -41,6 +50,17 @@ class SubQuestion(BaseModel):
     submitted_answer: Optional[str] = None
     performance: Optional[Performance] = None
     feedback: Optional[str] = None
+
+    @model_serializer
+    def serialize_model(self):
+        """Serialize the subquestion with enum values."""
+        data = {}
+        for field_name, field_value in self.__dict__.items():
+            if isinstance(field_value, Enum):
+                data[field_name] = field_value.value
+            else:
+                data[field_name] = field_value
+        return {k: v for k, v in data.items() if v is not None}
 
 
 class Question(BaseModel):

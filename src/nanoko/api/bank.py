@@ -340,7 +340,7 @@ class BankAPI:
     def get_questions(
         self,
         question_ids: Optional[List[int]] = None,
-        name: Optional[str] = None,
+        keyword: Optional[str] = None,
         source: Optional[str] = None,
         concept: Optional[ConceptType] = None,
         process: Optional[ProcessType] = None,
@@ -349,7 +349,7 @@ class BankAPI:
 
         Args:
             question_ids (Optional[List[int]], optional): The question ids of the questions. Defaults to None.
-            name (Optional[str], optional): The name of the question. Defaults to None.
+            keyword (Optional[str], optional): If the question's name contains the keyword or any of the sub-question's description contains the keyword. Defaults to None.
             source (Optional[str], optional): The source of the question. Defaults to None.
             concept (Optional[ConceptType], optional): The concept of questions. Defaults to None.
             process (Optional[ProcessType], optional): The process of questions. Defaults to None.
@@ -360,8 +360,8 @@ class BankAPI:
         params = {}
         if question_ids is not None:
             params["question_ids"] = question_ids
-        if name is not None:
-            params["name"] = name
+        if keyword is not None:
+            params["keyword"] = keyword
         if source is not None:
             params["source"] = source
         if concept is not None:

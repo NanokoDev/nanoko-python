@@ -1,7 +1,9 @@
+import datetime
 from enum import Enum
 from typing import List
 from pydantic import BaseModel, Field
 
+from nanoko.models.user import User
 from nanoko.models.assignment import Assignment
 
 
@@ -93,3 +95,27 @@ class Overview(BaseModel):
     display_name: str
     total_question_number: int
     performances: Performances
+
+
+class PerformanceDateData(BaseModel):
+    """Performance data of a student over time."""
+
+    performances: List[float]
+    dates: List[datetime.datetime]
+
+
+class ClassCard(BaseModel):
+    """Class card model for teacher's overview."""
+
+    class_id: int
+    name: str
+    student_number: int
+    assignments: List[Assignment]
+
+
+class TeacherOverview(BaseModel):
+    """Teacher's overview model for API."""
+
+    classes: List[ClassCard]
+    assignments: List[Assignment]
+    students: List[User]
