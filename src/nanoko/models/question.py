@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, model_serializer
+from pydantic import BaseModel, model_serializer
 
 
 # Unsolvable circular import
